@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import animation
 
 timescale = float(input ("Timescale: "))
+maxt = 100
 a = 10
 b = 8/3
 r = 28
@@ -31,9 +33,34 @@ flist = [f1,f2,f3]
 
 from rk4_fnc import rk4_gen
 
-(y, time) = rk4_gen(flist, initials, timescale)
+(y, time) = rk4_gen(flist, initials, timescale, maxt)
 
 y = y.tolist()
+
+print(y[0][0])
+
+## ANIMATION
+
+##fig = plt.figure(0)
+##ax = fig.gca(projection='3d')
+##line = ax.plot([], [], [], lw=2)
+##
+##
+##def init():
+##    line = ax.plot([], [], [], lw=2)
+##    return line
+##
+##def animate(i):
+##    line = ax.plot(y[0][i], y[1][i], y[2][i], lw=2)
+##    return line
+##
+##anim = animation.FuncAnimation(fig, animate, init_func=init,
+##                               frames=100, interval=20, blit=False)
+##
+##ax.relim()
+##ax.autoscale_view(True,True,True)
+##
+##plt.show()
 
 ## PLOTS
 
