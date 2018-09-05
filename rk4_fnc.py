@@ -4,7 +4,7 @@ import numpy as np
 #list of initial conditions
 #timescale (minimum time step dt/gridspacing d)
 
-def rk4_gen(flist, initials, timescale):
+def rk4_gen(flist, initials, timescale, maxt):
     
     time = [0]
     i = 0
@@ -20,7 +20,7 @@ def rk4_gen(flist, initials, timescale):
     n = len(initials)
     k = np.ndarray(shape=(n,4), dtype=float)  #RK coeffs for all n variables
 
-    while t < 100:
+    while t < maxt:
     
         for j in range(0,n):
             k[j,0] = flist[j](*y[:,i])
