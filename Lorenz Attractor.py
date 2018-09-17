@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 
-timescale = float(input ("Timescale: "))
+timescale = float(input ("Timescale: ")) #try 0.01
 maxt = 100
 a = 10
 b = 8/3
@@ -31,7 +31,7 @@ flist = [f1,f2,f3]
 
 ## APPLYING RK4 ALGO
 
-from rk4_fnc import rk4_gen
+from rk4_fnc_pre import rk4_gen
 
 (y, time) = rk4_gen(flist, initials, timescale, maxt)
 
