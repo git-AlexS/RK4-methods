@@ -1,13 +1,12 @@
 import numpy as np
 import math as m
+import random as rnd
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
+import integration_functions as fncs
 
 n = int(input ("2pi/n, n = ...")) #try n = 50
-
-damp = [0.05,0.25,0.8,2]
-force = [0.4, 0.1, 0.2, 0.5]
 
 g = 0.25
 w = 1
@@ -21,8 +20,16 @@ maxt_unround = 3000
 cycles = m.ceil(maxt_unround/(2*m.pi))
 maxt = cycles*2*m.pi
 
-for i in range(0,1):
+length = int(round((maxt/timescale)+1)) #slightly hacky, including 0th element
 
+def t(x):
+    return int(round(x / (w*timescale)))
+
+for p in range(0,2):
+
+    noise_rate = 50
+    noiseA = [0,2.5]
+    (rand) = fncs.noise(length, timescale, noise_rate, noiseA[p])
 
     # FUNCTIONS
 
@@ -33,7 +40,7 @@ for i in range(0,1):
 
     #f2 = r*y1-y2-y1*y3
     def f2(x,y,z):
-        a = -g*y+x-d*x**3 + F*m.cos(z)
+        a = -g*y+x-d*x**3 + F*(rand[t(z)]+m.cos(z))
         #a = -g*y+x-d*x**3 + F #(step)
         return a
 
@@ -47,60 +54,41 @@ for i in range(0,1):
 
     ## APPLYING RK4 ALGO
 
-    from rk4_fnc import rk4_gen
+    from rk4_fnc_pre import rk4_gen
 
     (y, time) = rk4_gen(flist, initials, timescale, maxt)
 
     y = y.tolist()
-
+    
     ## PLOTS
     
-    fig = plt.figure(i)
-    plt.plot(y[2],y[0], lw=0.5)
-
-    plt.xlabel("Time")
-    plt.ylabel("X axis")
+    fncs.plot_2d(y[2], y[0], 'Time', 'Position', str(p)+ '.0',lw = 0.5)
+    fncs.plot_2d(y[0], y[1], 'Position', 'Velocity', str(p)+ '.1',lw = 0.5)
     
-    fig=plt.figure(i + 1)
-    plt.plot(y[1],y[0], lw=0.5)
-
-    plt.xlabel("Velocity")
-    plt.ylabel("X axis")
-
     ## POINCARE
     
-    p_maps_pos = []
-    p_maps_vel = []
+    (p_maps_pos,p_maps_vel) = fncs.poincare_map(y[0],y[1],n,cycles)
     
-    for l in range(0,cycles):
-        p_maps_pos.append(y[0][l*n])
-        p_maps_vel.append(y[1][l*n])
+    fncs.plot_2d(p_maps_pos, p_maps_vel,
+                 'Position', 'Velocity', str(p)+ '.1',
+                 linestyle = 'none', marker = '.')
 
-    fig=plt.figure(i + 2)
-    plt.plot(p_maps_vel,p_maps_pos,'.')
+
+    ## EMBEDDED DIMENSION
+
+    start = 5
+    length = len(y[0])
     
-    plt.xlabel("Velocity")
-    plt.ylabel("X axis")
-
-
-##fig = plt.figure(1)
-##ax = fig.gca(projection='3d')
-##
-##ax.plot(y[0], y[1], y[2], lw=0.5)
-##
-##ax.set_xlabel("X Axis")
-##ax.set_ylabel("Y Axis")
-##ax.set_zlabel("Z Axis")
-##ax.set_title("Lorenz Attractor")
-##
-##fig = plt.figure(2)
-##ax1 = fig.gca(projection='3d')
-##
-##ax1.plot(y[0], y[1], time, lw=0.5)
-##
-##ax1.set_xlabel("X Axis")
-##ax1.set_ylabel("Y Axis")
-##ax1.set_zlabel("Time")
-##ax1.set_title("Lorenz Attractor")
+    position_add1 = fncs.embed_dim(y[0],length,start)
+    fncs.plot_2d(position_add1,y[0],
+                                'Position + ' + str(start), 'Position',
+                                str(p)+ '.3', lw = 0.5)
+    
+    (p_maps_pos2,p_maps_vel2) = fncs.poincare_map(position_add1,y[0],n,cycles)
+    
+    fncs.plot_2d(p_maps_pos2, p_maps_vel2,
+                 'Position + ' + str(start), 'Position', str(p)+ '.3',
+                 linestyle = 'none', marker = '.')
 
 plt.show()
+
