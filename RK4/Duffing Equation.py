@@ -16,7 +16,7 @@ initials = [0,0,0]
 
 timescale = (2*m.pi)/(w*n)
 
-maxt_unround = 3000
+maxt_unround = 300
 cycles = m.ceil(maxt_unround/(2*m.pi))
 maxt = cycles*2*m.pi
 
@@ -25,7 +25,7 @@ length = int(round((maxt/timescale)+1)) #slightly hacky, including 0th element
 def t(x):
     return int(round(x / (w*timescale)))
 
-for p in range(0,2):
+for p in range(1,2):
 
     noise_rate = 50
     noiseA = [0,2.5]
@@ -58,6 +58,7 @@ for p in range(0,2):
 
     (y, time) = rk4_gen(flist, initials, timescale, maxt)
 
+    yA = y
     y = y.tolist()
     
     ## PLOTS
@@ -90,5 +91,32 @@ for p in range(0,2):
                  'Position + ' + str(start), 'Position', str(p)+ '.3',
                  linestyle = 'none', marker = '.')
 
+    ## ANIMATION
+    
+    fig_ani = plt.figure(str(p)+ '.2')
+    ax1 = plt.gca()
+    
+    speed = 6 #increases speed of playback by skipping values
+    trail_par = round((1/timescale)*0.3) # vary the length of the trail
+
+    def update(num, data, line, trail_line, speed, trail_par):
+        line.set_data(data[:2, :speed*num])
+        trail_line.set_data(data[:2,speed*num:(speed*num+trail_par)])
+
+    line, = ax1.plot(yA[0,0:1], yA[1,0:1], lw = 0.5)
+    trail_line, = ax1.plot(yA[0,0:1], yA[1,0:1], lw = 1.5)
+    
+    ax1.set_xlim([min(y[0])-0.2, max(y[0])+0.2])
+    ax1.set_xlabel('X')
+
+    ax1.set_ylim([min(y[1])-0.2, max(y[1])+0.2])
+    ax1.set_ylabel('Y')
+
+    anim = animation.FuncAnimation(fig_ani, update,
+                                   fargs = (yA, line,trail_line, speed, trail_par),
+                                   blit=False, interval = 10,
+                                   save_count=m.ceil(len(y[0])/speed))
+    #anim.save('duffing_noise.mp4', fps = 30)
+    
 plt.show()
 

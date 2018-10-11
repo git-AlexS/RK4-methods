@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math as m
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
+import mpl_toolkits.mplot3d.axes3d as p3
 
 timescale = float(input ("Timescale: ")) #try 0.01
-maxt = 100
+maxt = 30
 a = 10
 b = 8/3
 r = 28
@@ -35,34 +37,46 @@ from rk4_fnc_pre import rk4_gen
 
 (y, time) = rk4_gen(flist, initials, timescale, maxt)
 
-y = y.tolist()
-
-print(y[0][0])
-
 ## ANIMATION
 
-##fig = plt.figure(0)
-##ax = fig.gca(projection='3d')
-##line = ax.plot([], [], [], lw=2)
-##
-##
-##def init():
-##    line = ax.plot([], [], [], lw=2)
-##    return line
-##
-##def animate(i):
-##    line = ax.plot(y[0][i], y[1][i], y[2][i], lw=2)
-##    return line
-##
-##anim = animation.FuncAnimation(fig, animate, init_func=init,
-##                               frames=100, interval=20, blit=False)
-##
-##ax.relim()
-##ax.autoscale_view(True,True,True)
-##
-##plt.show()
+fig = plt.figure(0)
+ax = p3.Axes3D(fig)
+
+speed = 8 #increases speed of playback by skipping values
+trail_par = round((1/timescale)*0.1) # vary the length of the trail
+
+def update(num, data, line, trail_line, speed, trail_par):
+    line.set_data(data[:2, :speed*num])
+    line.set_3d_properties(data[2, :speed*num])
+
+    
+    trail_line.set_data(data[:2,speed*num:(speed*num+trail_par)])
+    trail_line.set_3d_properties(data[2,speed*num:(speed*num+trail_par)])
+    
+line, = ax.plot(y[0,0:1], y[1,0:1], y[2,0:1], lw = 0.5) #initial line values
+trail_line, = ax.plot(y[0,0:1], y[1,0:1], y[2,0:1], lw = 1.5)
+
+ax.set_xlim3d([round(min(y[0])-1), round(max(y[0])+1)])
+ax.set_xlabel('X')
+
+ax.set_ylim3d([round(min(y[1])-1), round(max(y[1])+1)])
+ax.set_ylabel('Y')
+
+ax.set_zlim3d([round(min(y[2])-1), round(max(y[2])+1)])
+ax.set_zlabel('Z')
+         
+anim = animation.FuncAnimation(fig, update, fargs = (y, line,trail_line, speed, trail_par),
+                               blit=False, interval = 10
+                               ,save_count=m.ceil(len(y[0])/speed))
+
+##anim.save('lorenz.mp4', fps = 30)
+
+plt.show()
+
 
 ## PLOTS
+
+y = y.tolist()
 
 fig = plt.figure(1)
 ax = fig.gca(projection='3d')

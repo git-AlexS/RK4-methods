@@ -50,6 +50,9 @@ def embed_dim(x,length,start):
         
     return position_add1
 
+
+##MISC
+
 def bools_spatial_1var(pos, threshold, extract_from_diff):
 
     pos_filter = np.array([x > threshold for x in pos])

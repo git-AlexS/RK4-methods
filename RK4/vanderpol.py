@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 
+import integration_functions as fncs
+
 n = int(input ("2pi/n, n = ...")) #try n = 50
 
 mu = 8.5
@@ -51,49 +53,18 @@ for i in range(0,1):
     y = y.tolist()
 
     ## PLOTS
-    
-    fig = plt.figure(i)
-    plt.plot(y[2],y[0], lw=0.5)
 
-    plt.xlabel("Time")
-    plt.ylabel("X axis")
-    
-    fig=plt.figure(i + 1)
-    plt.plot(y[1],y[0], lw=0.5)
-
-    plt.xlabel("Velocity")
-    plt.ylabel("X axis")
-
-    ## POINCARE
-    
-    p_maps_pos = []
-    p_maps_vel = []
-    
-    for l in range(0,cycles):
-        p_maps_pos.append(y[0][l*n])
-        p_maps_vel.append(y[1][l*n])
-
-    fig=plt.figure(i + 1)
-    plt.plot(p_maps_vel,p_maps_pos,'.')
-    
-    plt.xlabel("Velocity")
-    plt.ylabel("X axis")
+    fncs.plot_2d(y[2], y[0], 'Time', 'Position', str(i)+ '.0',lw = 0.5)
+    fncs.plot_2d(y[1], y[0], 'Velocity', 'Position', str(i)+ '.1',lw = 0.5)
 
     ## EMBEDDED DIMENSION
 
-    def zerolistmaker(n):
-        return [0]*n
-    
     start = 5
     length = len(y[0])
-    position_add1 = zerolistmaker(length)
-    for j in range(start,length):
-        position_add1[j] = y[0][j-start]
-        
-    fig = plt.figure(i+3)
-    plt.plot(position_add1,y[0], lw=0.5)
-
-    plt.xlabel("X axis + " + str(start))
-    plt.ylabel("X axis")
+    
+    position_add1 = fncs.embed_dim(y[0],length,start)
+    fncs.plot_2d(position_add1,y[0],
+                                'Position + ' + str(start), 'Position',
+                                str(i)+ '.2', lw = 0.5)
 
 plt.show()
