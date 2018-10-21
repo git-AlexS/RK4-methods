@@ -7,7 +7,7 @@ import wavenumber_funcs as fncs
 
 ### DIALOG BOX
 
-y = np.genfromtxt('foo.txt', delimiter = ',')
+y = np.genfromtxt('dampedpulses.txt', delimiter = ',')
 #y = np.genfromtxt('dampedpulses.txt', delimiter = ',')
 y = np.matrix.transpose(y)
 y = y.astype(int)
@@ -58,9 +58,11 @@ while chunk_flag < len(chunks):
 
    for i in range(0,2):
       
+      print(longs_shorts[1-i])
       if np.size(longs_shorts[1-i]) == 0:
          dummy = np.array([100000,2,1-i,1,0])
          longs_shorts[1-i] = dummy.reshape(dummy.shape[0],-1)
+         
    ### Drill into E, T, O, X or just look at waves
 
    if drill_in ==1:
